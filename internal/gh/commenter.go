@@ -54,6 +54,7 @@ func NewCommenter(owner string, repo string, number int, personalAccessToken str
 // It takes a slice of comments as input and posts each comment on the pull request.
 // It returns an error if any occurs during the process.
 func (c *Commenter) Comment(comments []string) error {
+	totalComments := 0
 	for i, comment := range comments {
 		commentId := fmt.Sprintf("%s-%d", c.CommentIdPrefix, i)
 		// index := int64(i)
@@ -68,47 +69,38 @@ func (c *Commenter) Comment(comments []string) error {
 <!-- %s -->
 `
 		comment = fmt.Sprintf(template, title, comment, commentId)
-		c.logger.Printf("Posting comment")
-		commentObject, response, err := c.client.Issues.CreateComment(
+		_, response, err := c.client.Issues.CreateComment(
 			c.ctx,
 			c.owner,
 			c.repo,
 			c.prNumber,
-			&github.IssueComment{
-				Body: &comment,
-				// ID:     &index,
-				// NodeID: &commentId,
-			},
+			&github.IssueComment{Body: &comment},
 		)
 		if err != nil {
 			return err
 		}
 		if response.StatusCode != 201 {
-			return errors.New("failed to post comment: " + fmt.Sprintf("%v", response))
+			return errors.New("failed to post comment: " + fmt.Sprintf("%v", response.Body))
 		}
-		// var id int64
-		// id = *commentObject.ID
-		c.logger.Printf("Posted comment, id:", *commentObject.ID, "and node_id:", *commentObject.NodeID)
+		totalComments++
 	}
+	c.logger.Printf("Posted %d comments", totalComments)
 	return nil
 }
 
 // Delete all comments made by the previous run of this tool.
 func (c *Commenter) DeleteAllToolComments() error {
 	c.logger.Printf("Listing comments")
-	comments, resp, err := c.client.Issues.ListComments(c.ctx, c.owner, c.repo, c.prNumber, &github.IssueListCommentsOptions{ListOptions: github.ListOptions{PerPage: 100}})
-	c.logger.Printf("received response: %+v", resp.Response)
+	comments, _, err := c.client.Issues.ListComments(c.ctx, c.owner, c.repo, c.prNumber, &github.IssueListCommentsOptions{ListOptions: github.ListOptions{PerPage: 100}})
 	if err != nil {
 		return err
 	}
-	c.logger.Printf("found %d comments", len(comments))
+	c.logger.Printf("found %d comments to delete", len(comments))
 
 	for i, comment := range comments {
-		c.logger.Printf("found comment")
 		if strings.Contains(*comment.Body, fmt.Sprintf("%s-%d", c.CommentIdPrefix, i)) {
 			// if true {
 			resp, err := c.client.Issues.DeleteComment(c.ctx, c.owner, c.repo, *comment.ID)
-			c.logger.Printf("received response: %+v", resp.Response)
 			if resp.StatusCode != 204 {
 				c.logger.Println("Failed to delete comment: " + fmt.Sprintf("%v", resp))
 				break
@@ -120,8 +112,5 @@ func (c *Commenter) DeleteAllToolComments() error {
 			c.logger.Printf("Skipping comment: %s", *comment.Body)
 		}
 	}
-
-	return nil
-
 	return nil
 }

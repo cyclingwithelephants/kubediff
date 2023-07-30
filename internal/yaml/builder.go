@@ -98,13 +98,15 @@ func (B *Builder) build(branchPath, appPath string) (string, error) {
 		appPath,
 	)
 
-	renderedYaml := ""
-	// If the directory exists, run kustomize build on it
-	if _, err := os.Stat(fullAppPath); !os.IsNotExist(err) {
-		renderedYaml, err = B.kustomizeBuild(fullAppPath)
-		if err != nil {
-			return "", err
-		}
+	// If there is no directory, the yaml is emptys
+	if _, err := os.Stat(fullAppPath); os.IsNotExist(err) {
+		return "", nil
+	}
+
+	// If there is a kustomization.yaml file one level up, skip this directory
+	renderedYaml, err := B.kustomizeBuild(fullAppPath)
+	if err != nil {
+		return "", err
 	}
 
 	return renderedYaml, nil

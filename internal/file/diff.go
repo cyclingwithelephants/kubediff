@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
+	"path/filepath"
 
 	"github.com/gosimple/hashdir"
 
@@ -37,37 +39,46 @@ func (D *RealDiffer) Diff(a, b string) (string, error) {
 	return difflib.GetUnifiedDiffString(diff)
 }
 
-func (D *RealDiffer) HasDiff(dir1, dir2 string) (bool, error) {
+func (D *RealDiffer) HasDiff(dir1, dir2 string) (bool, string, error) {
 	// Check if both directories exist
 	// If either doesn't exist, it counts as a diff (e.g. adding or removing an app)
 	_, err1 := os.Stat(dir1)
 	_, err2 := os.Stat(dir2)
 	if os.IsNotExist(err1) {
-		D.logger.Println("Found diff because the directory doesn't exist:", dir1)
-		return true, nil
+		return true, fmt.Sprintf("the directory doesn't exist:", dir1), nil
 	} else if os.IsNotExist(err2) {
-		D.logger.Println("Found diff because the directory doesn't exist:", dir2)
-		return true, nil
+		return true, fmt.Sprintf("the directory doesn't exist:", dir2), nil
 	} else if err1 != nil {
-		return false, fmt.Errorf("error accessing directory %s: %w", dir1, err1)
+		return false, "", fmt.Errorf("error accessing directory %s: %w", dir1, err1)
 	} else if err2 != nil {
-		return false, fmt.Errorf("error accessing directory %s: %w", dir1, err2)
+		return false, "", fmt.Errorf("error accessing directory %s: %w", dir1, err2)
 	}
 
-	dir1Hash, err := hashdir.Make(dir1, "md5")
+	prevDir, err := os.Getwd()
 	if err != nil {
-		return false, fmt.Errorf("error hashing directory %s: %w", dir1, err)
+		return false, "", fmt.Errorf("error getting current directory: %w", err)
 	}
 
-	dir2Hash, err := hashdir.Make(dir2, "md5")
-	if err != nil {
-		return false, fmt.Errorf("error hashing directory %s: %w", dir2, err)
+	hashes := []string{}
+	for _, dir := range []string{dir1, dir2} {
+		err = os.Chdir(path.Join(dir, ".."))
+		if err != nil {
+			return false, "", fmt.Errorf("error changing directory to %s: %w", dir1, err)
+		}
+		hash, err := hashdir.Make(filepath.Base(dir1), "md5")
+		if err != nil {
+			return false, "", fmt.Errorf("error hashing directory %s: %w", dir1, err)
+		}
+		hashes = append(hashes, hash)
+		err = os.Chdir(prevDir)
+		if err != nil {
+			return false, "", fmt.Errorf("error changing directory to %s: %w", prevDir, err)
+		}
 	}
 
-	if dir1Hash != dir2Hash {
-		D.logger.Println("Found diff because the directories have different hashes")
-		return true, nil
+	if hashes[0] != hashes[1] {
+		return true, fmt.Sprintf("the directories have different hashes"), nil
 	}
 
-	return false, nil
+	return false, "", nil
 }

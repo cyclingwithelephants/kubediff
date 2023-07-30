@@ -39,7 +39,7 @@ type Tool struct {
 
 type Differ interface {
 	Diff(pathA, pathB string) (string, error)
-	HasDiff(dir1, dir2 string) (bool, error)
+	HasDiff(dir1, dir2 string) (bool, string, error)
 }
 
 type TemplateRenderer interface {
@@ -125,13 +125,24 @@ func (S Tool) RunToCompletion() error {
 	for eachApp := range allApps {
 		dir1 := filepath.Join(S.config.prDir, S.config.envsDir, eachApp)
 		dir2 := filepath.Join(S.config.targetDir, S.config.envsDir, eachApp)
-		hasDiff, err := S.differ.HasDiff(dir1, dir2)
+		hasDiff, reason, err := S.differ.HasDiff(dir1, dir2)
 		if err != nil {
 			return err
 		}
 		if hasDiff {
 			diffPaths[eachApp] = struct{}{}
-			S.logger.Println("diff found between branches for app: ", eachApp)
+			S.logger.Println("diff found between branches for app: ", eachApp, "reason:", reason)
+		}
+	}
+	// at each path, if the directory above has a kustomization.yaml, remove it from the list
+	for diffPath := range diffPaths {
+		fullPath := filepath.Join(S.config.prDir, S.config.envsDir, diffPath, "..", "kustomization.yaml")
+		exists, err := utils.FileExists(fullPath)
+		if err != nil {
+			return err
+		}
+		if exists {
+			delete(diffPaths, diffPath)
 		}
 	}
 
@@ -170,14 +181,6 @@ func (S Tool) RunToCompletion() error {
 				Diff:    chunk,
 			})
 		}
-		// If we have more than 2 chunks for a single app, that's a bit silly and we shouldn't be making that many comments
-		// I'm still playing with this number, but I think 2 is a good number for now.
-		// TODO: list the limitation that this isn't really very good for adding new apps
-		// TODO: perhaps we can list all of the resources that are going to be created instead of the actual diffs
-		//if len(chunks) > 2 {
-		//	S.logger.Println("too many chunks to render. Built ", len(chunks), " chunks for app: ", fileDiff.AppPath)
-		//	os.Exit(0)
-		//}
 	}
 
 	// render the comment templates
@@ -197,7 +200,7 @@ func (S Tool) RunToCompletion() error {
 	}
 
 	// clean up old comments
-	S.logger.Println("deleting all old comments")
+	S.logger.Println("begin deleting all old comments")
 	err = S.githubCommenter.DeleteAllToolComments()
 	if err != nil {
 		return err
@@ -212,9 +215,9 @@ func (S Tool) RunToCompletion() error {
 }
 
 func main() {
-	Tool := New()
-	err := Tool.RunToCompletion()
+	tool := New()
+	err := tool.RunToCompletion()
 	if err != nil {
-		log.Fatal(err)
+		tool.logger.Fatal(err)
 	}
 }
