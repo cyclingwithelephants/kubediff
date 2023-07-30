@@ -3,11 +3,12 @@ package gh
 import (
 	"context"
 	"fmt"
+	"log"
+	"strings"
+
 	"github.com/google/go-github/v41/github"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
-	"log"
-	"strings"
 )
 
 // Commenter is a struct for interacting with the GitHub API.
@@ -55,7 +56,7 @@ func NewCommenter(owner string, repo string, number int, personalAccessToken str
 func (c *Commenter) Comment(comments []string) error {
 	for i, comment := range comments {
 		commentId := fmt.Sprintf("%s-%d", c.CommentIdPrefix, i)
-		//index := int64(i)
+		// index := int64(i)
 		// add tags to comment so we can easily delete it later
 		title := ""
 		if i == 0 && len(comments) > 1 {
@@ -75,8 +76,8 @@ func (c *Commenter) Comment(comments []string) error {
 			c.prNumber,
 			&github.IssueComment{
 				Body: &comment,
-				//ID:     &index,
-				//NodeID: &commentId,
+				// ID:     &index,
+				// NodeID: &commentId,
 			},
 		)
 		if err != nil {
@@ -85,8 +86,8 @@ func (c *Commenter) Comment(comments []string) error {
 		if response.StatusCode != 201 {
 			return errors.New("failed to post comment: " + fmt.Sprintf("%v", response))
 		}
-		//var id int64
-		//id = *commentObject.ID
+		// var id int64
+		// id = *commentObject.ID
 		c.logger.Printf("Posted comment, id:", *commentObject.ID, "and node_id:", *commentObject.NodeID)
 	}
 	return nil
@@ -105,7 +106,7 @@ func (c *Commenter) DeleteAllToolComments() error {
 	for i, comment := range comments {
 		c.logger.Printf("found comment")
 		if strings.Contains(*comment.Body, fmt.Sprintf("%s-%d", c.CommentIdPrefix, i)) {
-			//if true {
+			// if true {
 			resp, err := c.client.Issues.DeleteComment(c.ctx, c.owner, c.repo, *comment.ID)
 			c.logger.Printf("received response: %+v", resp.Response)
 			if resp.StatusCode != 204 {

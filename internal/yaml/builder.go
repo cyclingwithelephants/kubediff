@@ -108,24 +108,6 @@ func (B *Builder) build(branchPath, appPath string) (string, error) {
 	}
 
 	return renderedYaml, nil
-
-	//fullAppPathWithTmpPrefix := filepath.Join(
-	//	B.renderedYamlWriteRoot,
-	//	fullAppPath,
-	//)
-
-	//// ensure that the rendered yaml directory exists
-	//err := B.ensureDir(fullAppPathWithTmpPrefix)
-	//if err != nil {
-	//	return "", err
-	//
-	//}
-
-	// write the rendered yaml to the rendered yaml directory
-	//return utils.WriteStringToFile(
-	//	filepath.Join(fullAppPathWithTmpPrefix, generatedYamlFileName),
-	//	renderedYaml,
-	//)
 }
 
 func (B *Builder) ensureDir(dirPath string) error {

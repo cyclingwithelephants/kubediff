@@ -2,9 +2,10 @@ package file
 
 import (
 	"fmt"
-	"github.com/gosimple/hashdir"
 	"log"
 	"os"
+
+	"github.com/gosimple/hashdir"
 
 	"github.com/martinohmann/go-difflib/difflib"
 )

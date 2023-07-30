@@ -3,12 +3,13 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"log"
+	"path/filepath"
+
 	"github.com/cyclingwithelephants/kubediff/internal/file"
 	"github.com/cyclingwithelephants/kubediff/internal/gh"
 	"github.com/cyclingwithelephants/kubediff/internal/utils"
 	"github.com/cyclingwithelephants/kubediff/internal/yaml"
-	"log"
-	"path/filepath"
 )
 
 type Config struct {
@@ -98,7 +99,6 @@ func New() Tool {
 }
 
 func newConfig() Config {
-
 	return Config{
 		prDir:                 utils.DefaultEnv("PR_BRANCH_DIR", "pr"),
 		targetDir:             utils.DefaultEnv("TARGET_BRANCH_DIR", "target"),
