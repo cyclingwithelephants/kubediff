@@ -118,6 +118,7 @@ func (S Tool) RunToCompletion() error {
 	// finds all apps, regardless of which environment or branch they are in.
 	allApps, err := S.appFinder.GetAllAppPaths()
 	if err != nil {
+		S.logger.Println("error finding all apps:", err)
 		return err
 	}
 
@@ -127,6 +128,7 @@ func (S Tool) RunToCompletion() error {
 		dir2 := filepath.Join(S.config.targetDir, S.config.envsDir, eachApp)
 		hasDiff, reason, err := S.differ.HasDiff(dir1, dir2)
 		if err != nil {
+			S.logger.Println("error checking if diff exists:", err)
 			return err
 		}
 		if hasDiff {
@@ -139,6 +141,7 @@ func (S Tool) RunToCompletion() error {
 		fullPath := filepath.Join(S.config.prDir, S.config.envsDir, diffPath, "..", "kustomization.yaml")
 		exists, err := utils.FileExists(fullPath)
 		if err != nil {
+			S.logger.Println("error checking if file exists:", err)
 			return err
 		}
 		if exists {
@@ -149,6 +152,7 @@ func (S Tool) RunToCompletion() error {
 	// render the yaml for each diffPath
 	builtYamls := []yaml.BuiltYaml{}
 	for diffPath := range diffPaths {
+		S.logger.Println("building yaml for path:", diffPath)
 		builtYaml, err := S.yamlBuilder.Build(diffPath)
 		if err != nil {
 			return err
@@ -203,11 +207,13 @@ func (S Tool) RunToCompletion() error {
 	S.logger.Println("begin deleting all old comments")
 	err = S.githubCommenter.DeleteAllToolComments()
 	if err != nil {
+		S.logger.Println("error deleting old comments:", err)
 		return err
 	}
 	// create a PR comment for each rendered template
 	err = S.githubCommenter.Comment(renderedTemplates)
 	if err != nil {
+		S.logger.Println("error commenting:", err)
 		return err
 	}
 

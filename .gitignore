@@ -26,3 +26,4 @@ target/
 manifests/
 rendered/
 .env
+.idea

@@ -11,8 +11,6 @@ import (
 	"path/filepath"
 )
 
-const generatedYamlFileName = "generated.yaml"
-
 type BuiltYaml struct {
 	AppPath          string
 	YamlPrBranch     string
@@ -50,12 +48,16 @@ func (B *Builder) kustomizeBuild(directory string) (string, error) {
 	if _, err := os.Stat(path.Join(directory, "kustomization.yaml")); errors.Is(err, os.ErrNotExist) {
 		return "", fmt.Errorf("directory %s does not contain kustomization.yaml", directory)
 	}
+	B.logger.Println("running kustomize build on directory:", directory)
 	cmd := exec.Command("kustomize", "build", "--enable-helm", directory)
 	var out bytes.Buffer
+	var outErr bytes.Buffer
 	cmd.Stdout = &out
+	cmd.Stderr = &outErr
 	err := cmd.Run()
+	B.logger.Println(outErr.String())
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("kustomize build failed: %s", outErr.String())
 	}
 	return out.String(), nil
 }
@@ -84,7 +86,7 @@ func (B *Builder) buildForEach(appPath string) ([]string, error) {
 	for _, branchPath := range branchPaths {
 		renderedYaml, err := B.build(branchPath, appPath)
 		if err != nil {
-			return renderedYamls, err
+			return []string{}, err
 		}
 		renderedYamls = append(renderedYamls, renderedYaml)
 	}
@@ -103,20 +105,10 @@ func (B *Builder) build(branchPath, appPath string) (string, error) {
 		return "", nil
 	}
 
-	// If there is a kustomization.yaml file one level up, skip this directory
 	renderedYaml, err := B.kustomizeBuild(fullAppPath)
 	if err != nil {
 		return "", err
 	}
 
 	return renderedYaml, nil
-}
-
-func (B *Builder) ensureDir(dirPath string) error {
-	B.logger.Println("creating directory: ", dirPath)
-	err := os.MkdirAll(dirPath, 0o755)
-	if err != nil {
-		return err
-	}
-	return nil
 }
