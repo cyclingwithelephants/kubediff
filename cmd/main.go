@@ -171,7 +171,7 @@ func (S Tool) RunToCompletion() error {
 
 	fileDiffs := []file.Diff{}
 	for _, builtYaml := range builtYamls {
-		diff, err := S.differ.Diff(builtYaml.YamlTargetBranch, builtYaml.YamlPrBranch)
+		diff, err := S.differ.Diff(builtYaml.YamlPrBranch, builtYaml.YamlTargetBranch)
 		if err != nil {
 			return err
 		}
