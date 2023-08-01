@@ -4,7 +4,7 @@
 If you've got a better idea for a name, I'm all ears.
 
 Due to the usage of helm, kustomize, etc PRs contain diffs only of pre-rendered yamls, which can make it difficult to evaluate changes to your GitOps repo. 
-This tool is designed to help with that by building the changed manigests and writing a git-style diff as one or more comments to your PR.
+This tool is designed to help with that by building the changed manifests and writing a git-style diff as one or more comments to your PR.
 
 ## Usage
 ### Configuration
