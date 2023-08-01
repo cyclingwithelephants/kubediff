@@ -83,6 +83,7 @@ jobs:
 ## Limitations
 - This only deals with kustomize. 
   The good news is that this might not be the large downside it seems.
+  
   Kustomize supports: 
   - [helm charts](https://github.com/kubernetes-sigs/kustomize/blob/master/examples/chart.md)
   - bare yaml
