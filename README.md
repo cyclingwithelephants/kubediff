@@ -78,7 +78,7 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
 ```
 
-## Limitations
+## Limitations and Assumptions
 - This only deals with kustomize. 
   The good news is that this might not be the large downside it seems.
   
