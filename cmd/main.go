@@ -24,6 +24,8 @@ type Config struct {
 	githubRepo            string
 	githubPrNumber        int
 	githubToken           string
+	diffWithColour        bool
+	diffContextLines      int
 }
 
 type Tool struct {
@@ -65,8 +67,8 @@ type GithubCommenter interface {
 
 func New() Tool {
 	logger := log.Default()
-	differ := file.NewRealDiffer(logger)
 	config := newConfig()
+	differ := file.NewRealDiffer(logger, config.diffContextLines, config.diffWithColour)
 	logger.Println("creating server with config:", fmt.Sprintf("%+v", config))
 	return Tool{
 		config:   config,
@@ -103,20 +105,22 @@ func newConfig() Config {
 		prDir:                 utils.DefaultEnv("PR_BRANCH_DIR", "pr"),
 		targetDir:             utils.DefaultEnv("TARGET_BRANCH_DIR", "target"),
 		envsDir:               utils.MustGetEnv("ENVS_DIR"),
-		globLevels:            utils.MustGetEnvAsInt("GLOB_LEVELS"),
+		globLevels:            utils.AsInt(utils.MustGetEnv("GLOB_LEVELS")),
 		renderedYamlWriteRoot: utils.DefaultEnv("RENDERED_WRITE_PATH", "rendered"),
 		tempPath:              utils.DefaultEnv("TEMP_PATH", "tmp"),
 		renderedCommentPath:   utils.DefaultEnv("TEMP_PATH", "tmp"),
 		githubOwner:           utils.MustGetEnv("GITHUB_OWNER"),
 		githubRepo:            utils.MustGetEnv("GITHUB_REPO"),
-		githubPrNumber:        utils.MustGetEnvAsInt("GITHUB_PR_NUMBER"),
+		githubPrNumber:        utils.AsInt(utils.MustGetEnv("GITHUB_PR_NUMBER")),
 		githubToken:           utils.MustGetEnv("GITHUB_TOKEN"),
+		diffWithColour:        utils.AsBool(utils.DefaultEnv("DIFF_WITH_COLOUR", "true")),
+		diffContextLines:      utils.AsInt(utils.DefaultEnv("DIFF_CONTEXT_LINES", "3")),
 	}
 }
 
 func (S Tool) RunToCompletion() error {
 	// clean up old comments
-	// we do this first so that the built diff is as up-to-date as possible
+	// we do this first ti reduce likelihood of confusion with the new comments
 	S.logger.Println("begin deleting all old comments")
 	err := S.githubCommenter.DeleteAllToolComments()
 	if err != nil {
