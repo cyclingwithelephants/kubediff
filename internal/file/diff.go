@@ -18,12 +18,16 @@ type Diff struct {
 }
 
 type RealDiffer struct {
-	logger *log.Logger
+	logger  *log.Logger
+	context int // lines of context around each diff.
+	colour  bool
 }
 
-func NewRealDiffer(logger *log.Logger) *RealDiffer {
+func NewRealDiffer(logger *log.Logger, context int, colour bool) *RealDiffer {
 	return &RealDiffer{
-		logger: logger,
+		logger:  logger,
+		context: context,
+		colour:  colour,
 	}
 }
 
@@ -33,8 +37,8 @@ func (D *RealDiffer) Diff(a, b string) (string, error) {
 		B:        difflib.SplitLines(b),
 		FromFile: "",
 		ToFile:   "",
-		Context:  5, // lines of context around each diff. TODO: make this configurable
-		Color:    true,
+		Context:  D.context,
+		Color:    D.colour,
 	}
 	return difflib.GetUnifiedDiffString(diff)
 }

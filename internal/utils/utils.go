@@ -37,13 +37,20 @@ func MustGetEnv(envVarName string) string {
 	return ""
 }
 
-func MustGetEnvAsInt(envVarName string) int {
-	result := MustGetEnv(envVarName)
-	resultAsInteger, err := strconv.Atoi(result)
+func AsInt(val string) int {
+	result, err := strconv.Atoi(val)
 	if err != nil {
-		log.Fatalf("%s must be an integer: %s", envVarName, err)
+		log.Fatalf("%s must be an integer: %s", val, err)
 	}
-	return resultAsInteger
+	return result
+}
+
+func AsBool(val string) bool {
+	result, err := strconv.ParseBool(val)
+	if err != nil {
+		log.Fatalf("%s must be a boolean: %s", val, err)
+	}
+	return result
 }
 
 // Set represents a mathematical set
