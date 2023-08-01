@@ -33,7 +33,7 @@ func (D *RealDiffer) Diff(a, b string) (string, error) {
 		B:        difflib.SplitLines(b),
 		FromFile: "",
 		ToFile:   "",
-		Context:  3,
+		Context:  5, // lines of context around each diff. TODO: make this configurable
 		Color:    true,
 	}
 	return difflib.GetUnifiedDiffString(diff)

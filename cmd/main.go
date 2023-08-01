@@ -115,6 +115,15 @@ func newConfig() Config {
 }
 
 func (S Tool) RunToCompletion() error {
+	// clean up old comments
+	// we do this first so that the built diff is as up-to-date as possible
+	S.logger.Println("begin deleting all old comments")
+	err := S.githubCommenter.DeleteAllToolComments()
+	if err != nil {
+		S.logger.Println("error deleting old comments:", err)
+		return err
+	}
+
 	// finds all apps, regardless of which environment or branch they are in.
 	allApps, err := S.appFinder.GetAllAppPaths()
 	if err != nil {
@@ -162,7 +171,7 @@ func (S Tool) RunToCompletion() error {
 
 	fileDiffs := []file.Diff{}
 	for _, builtYaml := range builtYamls {
-		diff, err := S.differ.Diff(builtYaml.YamlPrBranch, builtYaml.YamlTargetBranch)
+		diff, err := S.differ.Diff(builtYaml.YamlTargetBranch, builtYaml.YamlPrBranch)
 		if err != nil {
 			return err
 		}
@@ -203,13 +212,6 @@ func (S Tool) RunToCompletion() error {
 		renderedTemplates = append(renderedTemplates, renderedTemplate)
 	}
 
-	// clean up old comments
-	S.logger.Println("begin deleting all old comments")
-	err = S.githubCommenter.DeleteAllToolComments()
-	if err != nil {
-		S.logger.Println("error deleting old comments:", err)
-		return err
-	}
 	// create a PR comment for each rendered template
 	err = S.githubCommenter.Comment(renderedTemplates)
 	if err != nil {
