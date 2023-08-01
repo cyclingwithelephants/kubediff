@@ -5,7 +5,7 @@ If you've got a better idea for a name, I'm all ears.
 
 This tool [(example)](https://github.com/cyclingwithelephants/cloudlab/pull/7) is to k8s manifests as the diff part of [Atlantis](https://www.runatlantis.io/) is to terraform.
 
-Due to the usage of helm, kustomize etc it's not always easy to see what the final (rendered) manifests will look like when making changes to your GitOps repo.
+Due to the usage of helm, kustomize, etc it's not always easy to see what the final (rendered) manifests will look like when making changes to your GitOps repo.
 This tool is designed to help with that by building the changed manigests and writing the diff as a comment to your PR.
 
 ## Usage
