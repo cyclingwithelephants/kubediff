@@ -103,7 +103,7 @@ jobs:
     └── env-c
   ```
   - Those environment might have a tree of yaml, organised however you'd like, and you can recurse down that tree up to `${MAX_GLOBS}` levels to find the root kustomize.yaml that represents each manifest group.
-    Note that `cluster` below is one less level deep than `apps` and `addons` - this is allowed since the tool checks that the parent directory doesn't contain a `kustomize.yaml` file.
+    Note that `cluster` below is one less shallowed than `apps` and `addons` - this is allowed since the tool checks that the parent directory doesn't contain a `kustomize.yaml` file.
   ```bash
   env-a # example environment
   ├── addons
