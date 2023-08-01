@@ -3,10 +3,8 @@
 [No, not that kubediff](https://github.com/weaveworks/kubediff) - naming is hard ok? 
 If you've got a better idea for a name, I'm all ears.
 
-This tool [(example)](https://github.com/cyclingwithelephants/cloudlab/pull/7) is to k8s manifests as the diff part of [Atlantis](https://www.runatlantis.io/) is to terraform.
-
-Due to the usage of helm, kustomize, etc PRs contain diffs only of pre-rendered yamls, which can make it difficult to evaluate changes to your GitOps repo.
-This tool is designed to help with that by building the changed manigests and writing the diff as a comment to your PR.
+Due to the usage of helm, kustomize, etc PRs contain diffs only of pre-rendered yamls, which can make it difficult to evaluate changes to your GitOps repo. 
+This tool is designed to help with that by building the changed manigests and writing a git-style diff as one or more comments to your PR.
 
 ## Usage
 ### Configuration
