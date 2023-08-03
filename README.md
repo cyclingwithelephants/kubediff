@@ -112,9 +112,7 @@ jobs:
   ├── apps
   │   ├── app-a
   │   └── app-b
-  └── cluster
-      ├── kustomization.yaml # for example if you use CAPI
-      └── patches
+  └── cluster # for example if you use CAPI
   ```
   - Changes made outside the `${ENVS_DIR}` directory won't be picked up. For example, you might have a `base` directory that the environmental directories inherit from.
     I assume that changes to e.g. a `base` directory imply changes to an environmental directory too, therefore picking up the changes in the environmental directory might be sufficient.
