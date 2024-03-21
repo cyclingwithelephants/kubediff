@@ -14,8 +14,8 @@ github.com/google/go-github/v41 v41.0.0/go.mod h1:XgmCA5H323A9rtgExdTcnDkcqp6S30
 github.com/google/go-querystring v1.1.0 h1:AnCroh3fv4ZBgVIf1Iwtovgjaw/GiKJo8M8yD/fhyJ8=
 github.com/google/go-querystring v1.1.0/go.mod h1:Kcdr2DB4koayq7X8pmAG4sNG59So17icRSOU623lUBU=
 github.com/google/pprof v0.0.0-20190404155422-f8f10df84213/go.mod h1:zfwlbNMJ+OItoe0UupaVj+oy1omPYYDuagoSzA8v9mc=
-github.com/gosimple/hashdir v1.0.1 h1:XjdPRQn4mxBxX67UcI8lbgkYgwp+ImJI94wOESgTSHE=
-github.com/gosimple/hashdir v1.0.1/go.mod h1:ZHqV8l/vABzO60LzjBvh0ngegARL3NCE6YJsWhM1Ydw=
+github.com/gosimple/hashdir v1.0.2 h1:3h8l8CfLUeRgcJGDxJyJjfYFzDuZZo6HjwEm7I4inv4=
+github.com/gosimple/hashdir v1.0.2/go.mod h1:BqFbiXPzCbJAzK1ppHf+idDESsuauUqgq/hHYTBQnzE=
 github.com/martinohmann/go-difflib v1.1.0 h1:cWipyTDwXGZeN/J0D1PbkupyMvOnqTrKRSMZ68y8Rbc=
 github.com/martinohmann/go-difflib v1.1.0/go.mod h1:AcMcOkYMsAiB5qTRFy5lmqgbGkN4IOEGuuo3zNXQp/A=
 github.com/mattn/go-colorable v0.1.1 h1:G1f5SKeVxmagw/IyvzvtZE4Gybcc4Tr1tf7I8z0XgOg=
