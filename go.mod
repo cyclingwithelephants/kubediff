@@ -7,7 +7,7 @@ require (
 	github.com/gosimple/hashdir v1.0.1
 	github.com/martinohmann/go-difflib v1.1.0
 	github.com/pkg/errors v0.9.1
-	golang.org/x/oauth2 v0.20.0
+	golang.org/x/oauth2 v0.21.0
 )
 
 require (
